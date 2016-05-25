@@ -1,5 +1,6 @@
 // This is the triggers for all animation
 // animate consistently on left so that animate effect will not compete
+//this function can only work if fullscreen
 $(document).ready(function() {
   $("input").on("click", function() {
     $("h3").fadeOut(100, function() {
@@ -12,46 +13,68 @@ $(document).ready(function() {
       });
     });
   })
-  $("input").blur(function(){
-    $(this).animate({left:"-1%"},200, function(){
-      $("h3").fadeIn(200, function(){
-        $("#random").fadeIn(200, function(){
+  $("input").blur(function() {
+    $(this).animate({
+      left: "-1%"
+    }, 200, function() {
+      $("h3").fadeIn(200, function() {
+        $("#random").fadeIn(200, function() {
           $(".control-label").css("color", "black");
         })
       })
     })
   })
+
+  //define enter button to search
+  function submit() {
+    $(".form-control").on("keypress", function(e) {
+      if (e.keyCode == 13) {
+        performSearch();
+      }
+    })
+  }
+
+  //ajax to call search and append to html
+
+  function performSearch() {
+    $.ajax({
+      url: "https://en.wikipedia.org/w/api.php",
+      jsonp: "callback",
+      dataType: 'jsonp',
+      data: {
+        action: "query",
+        list: "search",
+        srsearch: $(".form-control").val(),
+        srinfo: "suggestion",
+        srlimit: "10",
+        format: "json"
+      },
+      xhrFields: {
+        withCredentials: true
+      },
+      success: displaySearch,
+      error: function(err) {
+        console.log(err);
+      }
+    });
+  }
+
+  function displaySearch(data) {
+    $(".form-control").empty(); //clear search
+
+    $.each(data.query.search, function(i, obj) {
+      string = "";
+
+      string += "<a href='https://en.wikipedia.org/wiki'" + obj.title.replace(" ", "_") + ">";
+      string += "<div class='outcome'>";
+      string += "<h5 class='title'>" + obj.title + "</h5>";
+      string += "<p class='snippet'>" + obj.snippet + "</p>";
+      string += "</div>";
+      string += "</a>";
+
+      $(".results").append(string);
+    });
+  }
+
+  submit();
 })
-
-//The code below is for Ajax for search
-//2 global variables 1 for search, the other to contain the result
-var input = '';
-var arr =[];
-
-//define your function for outcome
-
-function result(title, snippet){
-  this.title=title;
-  this.snippet=snippet;
-}
-
-//Below is Ajax
-
-function search(){
-  $.ajax({
- //this is key, rmb to val because it is possible to not return any search
- url:'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch=' + $('#search').val(),
-//dataType must be jsonp instead of json due to original policy
-    dataType:'jsonp',
-    method:'POST',
-//user-agent mentioned in wiki API
-    headers: {
-      'Api-User-Agent': 'Example/1.0'
-    },
-    success: function(data){
-      
-    }
-    
-  })
-}
-

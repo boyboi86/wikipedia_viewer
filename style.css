@@ -8,6 +8,14 @@ h3 {
   padding-right: 5%;
 }
 
+.well {
+  margin-right: 100px;
+  margin-left: 100px;
+}
+.results {
+  margin-top: 10%;
+}
+
 .control-label {
   padding-bottom:5px;
 }
@@ -96,4 +104,8 @@ input[type=search] {
 }
 #search input::-webkit-input-placeholder {
   color: transparent;
+}
+
+article {
+  display: block;
 }
